@@ -1,0 +1,144 @@
+# ==============================================================================
+# LOTA SECURITY PLATFORM - LOCAL DEVELOPMENT COMPOSE
+# ==============================================================================
+# WARNING: DEVELOPMENT ONLY. NEVER USE IN PRODUCTION OR PUBLIC ENVIRONMENTS.
+# All ports are strictly bound to 127.0.0.1 (localhost).
+# ==============================================================================
+
+version: '3.8'
+
+networks:
+  lota_dev_network:
+    driver: bridge
+
+volumes:
+  dev_postgres_data:
+  dev_minio_data:
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: lota-dev-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-lota_verity_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-verity_dev_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_only_verity_password_insecure}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - dev_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-verity_dev_user} -d ${POSTGRES_DB:-lota_verity_dev}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lota_dev_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: lota-dev-redis
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-dev_only_redis_password_insecure}"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-dev_only_redis_password_insecure}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lota_dev_network
+
+  minio:
+    image: minio/minio:RELEASE.2024-05-10T01-41-38Z
+    container_name: lota-dev-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio_dev_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-dev_only_minio_password_insecure}
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - dev_minio_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - lota_dev_network
+
+  opa:
+    image: openpolicyagent/opa:0.68.0-alpine
+    container_name: lota-dev-opa
+    restart: unless-stopped
+    command: ["run", "--server", "--addr", ":8181", "/policies"]
+    volumes:
+      - ./products/verity/policy/bundles:/policies:ro
+    ports:
+      - "127.0.0.1:8181:8181"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider http://127.0.0.1:8181/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - lota_dev_network
+
+  verity-api:
+    build:
+      context: .
+      dockerfile: products/verity/infrastructure/docker/api.Dockerfile
+    container_name: lota-verity-api
+    restart: unless-stopped
+    environment:
+      LOTA_ENV: development
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+      MINIO_ENDPOINT: minio:9000
+      OPA_URL: http://opa:8181/v1/data/posture
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - lota_dev_network
+
+  verity-worker:
+    build:
+      context: .
+      dockerfile: products/verity/infrastructure/docker/worker.Dockerfile
+    container_name: lota-verity-worker
+    restart: unless-stopped
+    environment:
+      LOTA_ENV: development
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-dev_only_redis_password_insecure}
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - lota_dev_network
+
+  verity-console:
+    build:
+      context: products/verity/apps/console
+      dockerfile: ../../infrastructure/docker/console.Dockerfile
+    container_name: lota-verity-console
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks:
+      - lota_dev_network

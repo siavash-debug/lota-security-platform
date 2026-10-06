@@ -1,0 +1,28 @@
+name: Policy-as-Code Verification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test-opa-policies:
+    name: OPA Rego Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      # open-policy-agent/setup-opa pinned to commit SHA (v2.2.0)
+      - name: Setup Open Policy Agent
+        uses: open-policy-agent/setup-opa@355d142ab46813476317d6b38c0bb47b0e50f38c # v2.2.0
+        with:
+          version: 'v0.68.0'
+
+      - name: Run OPA Rego Tests
+        run: |
+          opa test products/verity/policy/bundles/baseline/ -v

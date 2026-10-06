@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://lota.security/schemas/events/audit-event.json",
+  "title": "AuditEvent",
+  "description": "Schema for immutable platform audit log events.",
+  "type": "object",
+  "version": "1.0.0",
+  "required": [
+    "event_id",
+    "timestamp",
+    "actor",
+    "action",
+    "target",
+    "status"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "default": "1.0.0",
+      "description": "Schema version"
+    },
+    "event_id": {
+      "type": "string",
+      "pattern": "^evt_[0-9a-zA-Z]+$",
+      "description": "Unique prefixed identifier for the audit event"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp of event generation"
+    },
+    "actor": {
+      "type": "object",
+      "required": ["user_id", "role"],
+      "properties": {
+        "user_id": { "type": "string", "description": "Identifier of the actor initiating the operation" },
+        "role": { "type": "string", "description": "Role assigned to the actor" },
+        "tenant_id": { "type": "string", "description": "Optional tenant identifier" }
+      }
+    },
+    "action": {
+      "type": "string",
+      "description": "Canonical action identifier (e.g. asset.create, scan.start, remediation.approve)"
+    },
+    "target": {
+      "type": "object",
+      "required": ["entity_type", "entity_id"],
+      "properties": {
+        "entity_type": { "type": "string", "description": "Type of the entity being acted upon" },
+        "entity_id": { "type": "string", "description": "Identifier of the entity being acted upon" }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["SUCCESS", "FAILURE", "DENIED"],
+      "description": "Outcome status of the audited operation"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Sanitized contextual information (IP address, request ID, user agent)",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

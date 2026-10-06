@@ -1,0 +1,25 @@
+name: Documentation Integrity
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check-docs:
+    name: Verify Documentation Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      - name: Verify Documentation Links & Integrity
+        run: |
+          test -f docs/products/verity/source-of-truth.md || { echo "Authoritative source-of-truth.md missing!" >&2; exit 1; }
+          test -f docs/products/verity/architecture.md || { echo "Verity architecture.md missing!" >&2; exit 1; }
+          test -f docs/architecture/overview.md || { echo "Architecture overview missing!" >&2; exit 1; }
+          echo "Documentation integrity verified successfully."

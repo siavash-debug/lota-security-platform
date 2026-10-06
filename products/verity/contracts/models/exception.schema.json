@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://lota.security/schemas/models/exception.json",
+  "title": "PolicyException",
+  "description": "Schema representing an approved, expiring waiver for a policy control.",
+  "type": "object",
+  "version": "1.0.0",
+  "required": [
+    "exception_id",
+    "control_id",
+    "asset_scope",
+    "justification",
+    "compensating_controls",
+    "approved_by",
+    "expires_at"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "default": "1.0.0",
+      "description": "Schema version"
+    },
+    "exception_id": {
+      "type": "string",
+      "pattern": "^exception_[0-9a-zA-Z]+$",
+      "description": "Unique prefixed identifier for the exception"
+    },
+    "control_id": {
+      "type": "string",
+      "description": "Targeted policy control identifier (e.g. CONTAINER-PRIV-001)"
+    },
+    "asset_scope": {
+      "type": "string",
+      "description": "Scope of the exception: specific asset_id or glob pattern"
+    },
+    "justification": {
+      "type": "string",
+      "description": "Documented business and security justification"
+    },
+    "compensating_controls": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Active compensating controls mitigating the risk"
+    },
+    "approved_by": {
+      "type": "string",
+      "description": "Identity of the authorized security approver"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Mandatory expiration timestamp (maximum 90 days from grant)"
+    }
+  },
+  "additionalProperties": false
+}

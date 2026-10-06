@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://lota.security/schemas/models/evidence.json",
+  "title": "Evidence",
+  "description": "Schema representing tamper-evident proof supporting a finding.",
+  "type": "object",
+  "version": "1.0.0",
+  "required": [
+    "evidence_id",
+    "scan_id",
+    "collector",
+    "content_hash",
+    "observed_at"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "default": "1.0.0",
+      "description": "Schema version"
+    },
+    "evidence_id": {
+      "type": "string",
+      "pattern": "^evidence_[0-9a-zA-Z]+$",
+      "description": "Unique prefixed identifier for the evidence"
+    },
+    "scan_id": {
+      "type": "string",
+      "pattern": "^scan_[0-9a-zA-Z]+$",
+      "description": "Associated scan identifier"
+    },
+    "collector": {
+      "type": "string",
+      "description": "Originating analyzer or scanner tool"
+    },
+    "location": {
+      "type": "object",
+      "properties": {
+        "path": { "type": "string" },
+        "line_start": { "type": "integer", "minimum": 1 },
+        "line_end": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-fA-F]{64}$",
+      "description": "Cryptographic SHA-256 digest of the raw evidence payload"
+    },
+    "redacted_payload": {
+      "type": "object",
+      "description": "Sanitized excerpt of the evidence data",
+      "additionalProperties": true
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}

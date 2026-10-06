@@ -1,0 +1,15 @@
+# Global Owners
+* @lota-security/platform-maintainers
+
+# Platform Services & Shared Libraries
+/platform/ @lota-security/platform-maintainers
+/shared/ @lota-security/platform-maintainers
+/.github/ @lota-security/devsecops
+
+# Verity Product Owners
+/products/verity/ @lota-security/verity-team
+/docs/products/verity/ @lota-security/verity-team
+
+# Security Policies & Compliance
+/products/*/policy/ @lota-security/security-approvers
+/docs/policies/ @lota-security/security-approvers

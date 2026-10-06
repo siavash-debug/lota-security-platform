@@ -1,0 +1,27 @@
+name: Security & Secret Hygiene
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  secret-scan:
+    name: Repository Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          fetch-depth: 0
+
+      # gitleaks/gitleaks-action pinned to commit SHA (v2.3.4)
+      - name: Run Gitleaks Secret Scanner
+        uses: gitleaks/gitleaks-action@512686008eb27928e3b08e5e771d9d784a92c00c # v2.3.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true # Safe fallback during initial scaffolding if token lacks org permissions

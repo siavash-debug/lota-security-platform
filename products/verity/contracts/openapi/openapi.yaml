@@ -1,0 +1,244 @@
+openapi: 3.1.0
+info:
+  title: LOTA Security Verity API
+  version: 0.1.0
+  description: >
+    API Gateway contract for LOTA Security Verity: evidence-driven security
+    posture assessment platform.
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+paths:
+  /health:
+    get:
+      summary: Health Check
+      description: Returns service operational status.
+      responses:
+        '200':
+          description: Service is healthy.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, service, environment]
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: verity-api
+                  environment:
+                    type: string
+                    example: development
+
+  /ready:
+    get:
+      summary: Readiness Check
+      description: Returns service readiness status.
+      responses:
+        '200':
+          description: Service is ready.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ready]
+                properties:
+                  ready:
+                    type: boolean
+                    example: true
+
+  /v1/version:
+    get:
+      summary: Version Information
+      description: Returns application name, semantic version, and build info.
+      responses:
+        '200':
+          description: Application version metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [app_name, version, build, revision]
+                properties:
+                  app_name:
+                    type: string
+                    example: LOTA Security Verity
+                  version:
+                    type: string
+                    example: 0.1.0
+                  build:
+                    type: string
+                    example: development-scaffold
+                  revision:
+                    type: string
+                    example: placeholder-rev
+
+  /v1/assets/git:
+    post:
+      summary: Register Git Asset
+      description: Validates Git repository intake and resolves immutable commit SHA.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [repository_url, ref, owner_team]
+              properties:
+                repository_url:
+                  type: string
+                  format: uri
+                  example: https://github.com/example/repo
+                ref:
+                  type: string
+                  example: main
+                analysis_profile:
+                  type: string
+                  default: standard-static
+                owner_team:
+                  type: string
+                  example: security-engineering
+      responses:
+        '501':
+          description: Ingestion endpoint scaffolded (Not Implemented).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotImplementedResponse'
+
+  /v1/scans:
+    post:
+      summary: Initiate Scan
+      description: Schedules a security posture scan against an asset.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [asset_id, analysis_level]
+              properties:
+                asset_id:
+                  type: string
+                  example: asset_01H12345678901234567890123
+                analysis_level:
+                  type: string
+                  enum: [L0_METADATA, L1_STATIC, L2_ARTIFACT, L3_BUILD, L4_DYNAMIC]
+                policy_bundle_version:
+                  type: string
+                  default: latest-approved
+      responses:
+        '501':
+          description: Scan orchestration scaffolded (Not Implemented).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotImplementedResponse'
+
+  /v1/scans/{scan_id}:
+    get:
+      summary: Get Scan Status
+      description: Retrieves scan state and summary results.
+      parameters:
+        - name: scan_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '501':
+          description: Scan lookup scaffolded (Not Implemented).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotImplementedResponse'
+
+  /v1/findings:
+    get:
+      summary: List Findings
+      description: Retrieves detected security findings and evidence references.
+      parameters:
+        - name: asset_id
+          in: query
+          schema:
+            type: string
+        - name: severity
+          in: query
+          schema:
+            type: string
+      responses:
+        '501':
+          description: Findings query scaffolded (Not Implemented).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotImplementedResponse'
+
+  /v1/exceptions:
+    post:
+      summary: Request Policy Exception
+      description: Creates an expiring exception request for a policy control.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [control_id, asset_scope, justification]
+              properties:
+                control_id:
+                  type: string
+                asset_scope:
+                  type: string
+                justification:
+                  type: string
+      responses:
+        '501':
+          description: Policy exception workflow scaffolded (Not Implemented).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotImplementedResponse'
+
+  /v1/remediations/{remediation_id}/approve:
+    post:
+      summary: Approve Remediation
+      description: Records human sign-off on a proposed remediation action.
+      parameters:
+        - name: remediation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+      responses:
+        '501':
+          description: Remediation gate scaffolded (Not Implemented).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotImplementedResponse'
+
+components:
+  schemas:
+    NotImplementedResponse:
+      type: object
+      required: [error_code, message]
+      properties:
+        error_code:
+          type: string
+          example: NOT_IMPLEMENTED
+        message:
+          type: string
+          example: Endpoint is scaffolded and intentionally not implemented in this release.

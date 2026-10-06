@@ -1,0 +1,39 @@
+# ==============================================================================
+# LOTA Security Verity - Service Compose Definition
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  verity-api:
+    build:
+      context: ../../../
+      dockerfile: products/verity/infrastructure/docker/api.Dockerfile
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      LOTA_ENV: development
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+      MINIO_ENDPOINT: minio:9000
+      OPA_URL: http://opa:8181/v1/data/posture
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  verity-worker:
+    build:
+      context: ../../../
+      dockerfile: products/verity/infrastructure/docker/worker.Dockerfile
+    environment:
+      LOTA_ENV: development
+      REDIS_HOST: redis
+
+  verity-console:
+    build:
+      context: ../../apps/console
+      dockerfile: ../../infrastructure/docker/console.Dockerfile
+    ports:
+      - "127.0.0.1:3000:3000"

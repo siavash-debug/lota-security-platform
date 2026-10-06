@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://lota.security/schemas/models/finding.json",
+  "title": "Finding",
+  "description": "Schema representing a detected security posture finding or vulnerability.",
+  "type": "object",
+  "version": "1.0.0",
+  "required": [
+    "finding_id",
+    "control_id",
+    "title",
+    "severity",
+    "confidence",
+    "status",
+    "asset_id",
+    "scan_id",
+    "first_seen_at",
+    "last_seen_at"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "default": "1.0.0",
+      "description": "Schema version"
+    },
+    "finding_id": {
+      "type": "string",
+      "pattern": "^finding_[0-9a-zA-Z]+$",
+      "description": "Unique prefixed identifier for the finding"
+    },
+    "control_id": {
+      "type": "string",
+      "description": "Associated policy control identifier (e.g. CONTAINER-PRIV-001)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Concise descriptive title of the finding"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low", "info"],
+      "description": "Impact severity classification"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"],
+      "description": "Detection confidence rating"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["open", "suppressed", "exception_granted", "resolved"],
+      "default": "open",
+      "description": "Current lifecycle status of the finding"
+    },
+    "asset_id": {
+      "type": "string",
+      "pattern": "^asset_[0-9a-zA-Z]+$",
+      "description": "Target asset identifier"
+    },
+    "scan_id": {
+      "type": "string",
+      "pattern": "^scan_[0-9a-zA-Z]+$",
+      "description": "Originating scan identifier"
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^evidence_[0-9a-zA-Z]+$" },
+      "default": [],
+      "description": "List of associated evidence records"
+    },
+    "remediation": {
+      "type": "object",
+      "properties": {
+        "summary": { "type": "string" },
+        "automation_eligible": { "type": "boolean", "default": false }
+      },
+      "additionalProperties": false
+    },
+    "first_seen_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_seen_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}

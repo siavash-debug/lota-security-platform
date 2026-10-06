@@ -1,0 +1,36 @@
+version: 2
+updates:
+  # GitHub Actions Workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Shared Python Library
+  - package-ecosystem: "pip"
+    directory: "/shared/python"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Verity API Python Service
+  - package-ecosystem: "pip"
+    directory: "/products/verity/apps/api"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Verity Worker Python Service
+  - package-ecosystem: "pip"
+    directory: "/products/verity/apps/worker"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Verity Console Node.js Application
+  - package-ecosystem: "npm"
+    directory: "/products/verity/apps/console"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5

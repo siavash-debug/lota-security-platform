@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://lota.security/schemas/models/scan.json",
+  "title": "Scan",
+  "description": "Schema representing an assessment scan execution.",
+  "type": "object",
+  "version": "1.0.0",
+  "required": [
+    "scan_id",
+    "asset_id",
+    "analysis_level",
+    "policy_bundle_version",
+    "status",
+    "started_at"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "default": "1.0.0",
+      "description": "Schema version"
+    },
+    "scan_id": {
+      "type": "string",
+      "pattern": "^scan_[0-9a-zA-Z]+$",
+      "description": "Unique prefixed identifier for the scan"
+    },
+    "asset_id": {
+      "type": "string",
+      "pattern": "^asset_[0-9a-zA-Z]+$",
+      "description": "Foreign identifier of the associated asset"
+    },
+    "analysis_level": {
+      "type": "string",
+      "enum": ["L0_METADATA", "L1_STATIC", "L2_ARTIFACT", "L3_BUILD", "L4_DYNAMIC"],
+      "description": "Depth tier of the posture assessment"
+    },
+    "policy_bundle_version": {
+      "type": "string",
+      "description": "Semantic version or hash of the evaluated OPA Rego policy bundle"
+    },
+    "scanner_versions": {
+      "type": "object",
+      "description": "Map of scanner tools and executed version tags",
+      "additionalProperties": { "type": "string" }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "CREATED",
+        "VALIDATING",
+        "SNAPSHOT_RESOLVED",
+        "QUEUED",
+        "RUNNING",
+        "PARTIAL_SUCCESS",
+        "SUCCEEDED",
+        "FAILED",
+        "CANCELLED",
+        "TIMED_OUT"
+      ],
+      "description": "Lifecycle state of the scan"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Scan initiation timestamp"
+    },
+    "ended_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Scan conclusion timestamp"
+    }
+  },
+  "additionalProperties": false
+}

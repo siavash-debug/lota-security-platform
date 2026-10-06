@@ -1,0 +1,18 @@
+{
+  "version": "1.0.0",
+  "asset": {
+    "id": "asset_01H12345678901234567890123",
+    "type": "container",
+    "environment": "assessment"
+  },
+  "controls": {
+    "public_admin_exposure": false,
+    "mfa_required": true,
+    "api_keys_over_90_days": 0
+  },
+  "container": {
+    "run_as_root": false,
+    "docker_socket_mounted": false,
+    "privileged": false
+  }
+}

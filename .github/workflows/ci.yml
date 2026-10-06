@@ -1,0 +1,45 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Security: Explicitly declare least-privilege permissions
+permissions:
+  contents: read
+
+jobs:
+  validate-and-test:
+    name: Lint, Schema Validation & Tests
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout pinned to commit SHA (v4.1.7)
+      - name: Checkout Code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      # actions/setup-python pinned to commit SHA (v5.1.0)
+      - name: Set up Python 3.12
+        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
+        with:
+          python-version: '3.12'
+
+      - name: Install Python Test Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ./shared/python
+          pip install ./products/verity/apps/api
+          pip install pytest httpx
+
+      - name: Run Linting & Secret Pattern Checks
+        run: bash scripts/lint.sh
+
+      - name: Validate JSON Schemas & API Contracts
+        run: bash scripts/validate-contracts.sh
+
+      - name: Run Python Unit & Endpoint Tests
+        run: bash scripts/test.sh
+
+  # TODO: Release signing, provenance generation, SBOM publication,
+  # and environment protection rules must be configured prior to production deployment.

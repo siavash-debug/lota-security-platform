@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://lota.security/schemas/models/remediation.json",
+  "title": "RemediationRun",
+  "description": "Schema representing the lifecycle of an approval-gated remediation operation.",
+  "type": "object",
+  "version": "1.0.0",
+  "required": [
+    "remediation_id",
+    "finding_id",
+    "action_type",
+    "status",
+    "proposed_change",
+    "created_at"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "default": "1.0.0",
+      "description": "Schema version"
+    },
+    "remediation_id": {
+      "type": "string",
+      "pattern": "^rem_[0-9a-zA-Z]+$",
+      "description": "Unique prefixed identifier for the remediation run"
+    },
+    "finding_id": {
+      "type": "string",
+      "pattern": "^finding_[0-9a-zA-Z]+$",
+      "description": "Associated finding identifier"
+    },
+    "action_type": {
+      "type": "string",
+      "enum": ["pr_create", "config_patch", "ticket_create", "manual_guide"],
+      "description": "Type of remediation action proposed"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "PROPOSED",
+        "AWAITING_APPROVAL",
+        "OWNER_APPROVED",
+        "SECURITY_APPROVED",
+        "EXECUTING",
+        "COMPLETED",
+        "FAILED",
+        "ROLLED_BACK"
+      ],
+      "description": "Current status in the approval state machine"
+    },
+    "proposed_change": {
+      "type": "object",
+      "description": "Exact configuration patch, file diff, or ticket body",
+      "additionalProperties": true
+    },
+    "approvals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["approver_id", "role", "approved_at"],
+        "properties": {
+          "approver_id": { "type": "string" },
+          "role": { "type": "string" },
+          "approved_at": { "type": "string", "format": "date-time" },
+          "reason": { "type": "string" }
+        }
+      },
+      "default": []
+    },
+    "rollback_plan": {
+      "type": "object",
+      "description": "Executable specification for rolling back changes if execution fails"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://lota.security/schemas/models/asset.json",
+  "title": "Asset",
+  "description": "Schema representing an asset subject to security posture assessment.",
+  "type": "object",
+  "version": "1.0.0",
+  "required": [
+    "asset_id",
+    "asset_type",
+    "source_url",
+    "immutable_ref",
+    "owner_team",
+    "created_at"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "default": "1.0.0",
+      "description": "Schema version"
+    },
+    "asset_id": {
+      "type": "string",
+      "pattern": "^asset_[0-9a-zA-Z]+$",
+      "description": "Unique prefixed identifier for the asset"
+    },
+    "asset_type": {
+      "type": "string",
+      "enum": ["git_repository", "container_image", "artifact_bundle", "sbom", "security_tool"],
+      "description": "Category of the evaluated asset"
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Normalized location or repository URI"
+    },
+    "immutable_ref": {
+      "type": "object",
+      "description": "Cryptographically pinned reference (e.g. commit SHA or container digest)",
+      "properties": {
+        "commit_sha": { "type": "string", "pattern": "^[0-9a-fA-F]{40,64}$" },
+        "branch_at_submission": { "type": "string" },
+        "image_digest": { "type": "string" },
+        "artifact_hash": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "owner_team": {
+      "type": "string",
+      "description": "Designated owner team or organization unit"
+    },
+    "environment": {
+      "type": "string",
+      "enum": ["development", "staging", "production", "assessment"],
+      "default": "assessment",
+      "description": "Deployment environment tier"
+    },
+    "criticality": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"],
+      "default": "medium",
+      "description": "Business impact tier"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of asset ingestion"
+    }
+  },
+  "additionalProperties": false
+}
